@@ -1,0 +1,30 @@
+{
+    "manifest_version": 2,
+    "name": "Munz Addr",
+    "version": "0.0.1",
+
+    "description": "Reverse geocode a munzee and add its address to the page",
+
+    "page_action": {
+	"default_title": "munz_addr"
+    },
+
+    "permissions": [
+        "https://dev.virtualearth.net/*",
+        "storage"
+    ],
+
+    "options_ui": {
+        "page": "options.htm",
+        "open_in_tab": false
+    },
+
+    "content_scripts": [
+	{
+	    "matches": [
+		"https://www.munzee.com/m/*"
+	    ],
+	    "js": ["main.js"]
+	}
+    ]
+}
