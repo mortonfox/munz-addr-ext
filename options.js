@@ -1,5 +1,5 @@
 function flash_result(color, message) {
-  let status = document.getElementById('status');
+  const status = document.getElementById('status');
   status.style.color = color;
   status.textContent = message;
   setTimeout(() => { status.textContent = ''; }, 1000);
@@ -7,15 +7,14 @@ function flash_result(color, message) {
 
 // Saves Bing Maps key to chrome.storage
 function save_options(e) {
-  let bing_maps_key = document.getElementById('bing_maps_key').value;
+  const bing_maps_key = document.getElementById('bing_maps_key').value;
 
-  let url = `https://dev.virtualearth.net/REST/v1/Locations/0,0?key=${bing_maps_key}`;
+  const url = `https://dev.virtualearth.net/REST/v1/Locations/0,0?key=${bing_maps_key}`;
 
-  let xhr = new XMLHttpRequest();
-
-  // Test the key.
-  fetch(url)
-    .then(resp => {
+  (async () => {
+    try {
+      // Test the key.
+      const resp = await fetch(url);
       if (!resp.ok) {
         throw new Error(`Status = ${resp.status} ${resp.statusText}`);
       }
@@ -27,10 +26,11 @@ function save_options(e) {
         // Update status to let user know options were saved.
         flash_result('green', 'Options saved.');
       });
-    })
-    .catch(err => {
+    }
+    catch (err) {
       flash_result('red', `Invalid key or other Bing Maps error. ${err.message}`);
-    });
+    }
+  })();
 
   e.preventDefault();
 }
@@ -46,3 +46,5 @@ function restore_options() {
 
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('munz_addr_options').addEventListener('submit', save_options);
+
+// -- The End --
