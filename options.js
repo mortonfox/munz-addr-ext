@@ -14,24 +14,23 @@ function save_options(e) {
   let xhr = new XMLHttpRequest();
 
   // Test the key.
-  xhr.open('GET', url, true);
+  fetch(url)
+    .then(resp => {
+      if (!resp.ok) {
+        throw new Error(`Status = ${resp.status} ${resp.statusText}`);
+      }
 
-  xhr.onload = () => {
-    if (xhr.status !== 200) {
-      flash_result('red', `Invalid key or other Bing Maps error. Status = ${xhr.status}`);
-      return;
-    }
-
-    // Key was accepted by Bing Maps.
-    chrome.storage.local.set({
-      bingMapsKey: bing_maps_key
-    }, () => {
-      // Update status to let user know options were saved.
-      flash_result('green', 'Options saved.');
+      // Key was accepted by Bing Maps.
+      chrome.storage.local.set({
+        bingMapsKey: bing_maps_key
+      }, () => {
+        // Update status to let user know options were saved.
+        flash_result('green', 'Options saved.');
+      });
+    })
+    .catch(err => {
+      flash_result('red', `Invalid key or other Bing Maps error. ${err.message}`);
     });
-  }
-
-  xhr.send();
 
   e.preventDefault();
 }

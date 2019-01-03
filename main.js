@@ -11,30 +11,27 @@ function init() {
     let key = result.bingMapsKey;
     let url = `https://dev.virtualearth.net/REST/v1/Locations/${lat},${lon}?key=${key}`;
 
-    let xhr = new XMLHttpRequest();
+    fetch(url)
+      .then(resp => {
+        if (!resp.ok) {
+          throw new Error(`Status = ${resp.status} ${resp.statusText}`);
+        }
+        return resp.json();
+      })
+      .then(jsonobj => {
+        let addr = jsonobj.resourceSets[0].resources[0].name;
+        if (addr === undefined) {
+          return;
+        }
 
-    xhr.open('GET', url, true);
-
-    xhr.onload = () => {
-      if (xhr.status !== 200) {
-        console.log(`Fetch failed. xhr.status = ${xhr.status}`);
-        return;
-      }
-
-      let obj = JSON.parse(xhr.responseText);
-
-      let addr = obj.resourceSets[0].resources[0].name;
-      if (addr === undefined) {
-        return;
-      }
-
-      let addr_elem = document.createElement('div');
-      addr_elem.style.textAlign = 'center';
-      addr_elem.textContent = addr;
-      loctext.parentNode.insertBefore(addr_elem, loctext);
-    }
-
-    xhr.send();
+        let addr_elem = document.createElement('div');
+        addr_elem.style.textAlign = 'center';
+        addr_elem.textContent = addr;
+        loctext.parentNode.insertBefore(addr_elem, loctext);
+      })
+      .catch(err => {
+        console.log(`Fetch error: ${err.message}`);
+      });
   });
 }
 
