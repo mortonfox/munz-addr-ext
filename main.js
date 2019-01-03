@@ -29,8 +29,8 @@ function init() {
       }
 
       let addr_elem = document.createElement('div');
-      addr_elem.setAttribute('align', 'center');
-      addr_elem.appendChild(document.createTextNode(addr));
+      addr_elem.style.textAlign = 'center';
+      addr_elem.textContent = addr;
       loctext.parentNode.insertBefore(addr_elem, loctext);
     }
 
