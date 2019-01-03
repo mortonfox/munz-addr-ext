@@ -35,6 +35,8 @@ Find the extension's icon (most likely a gray 'M' or a default icon since we
 don't have one yet for this extension) in the Chrome URL bar and right-click
 on it.
 
+Select 'Options' in the menu.
+
 ![Options popup](https://mortonfox.github.io/munz-addr-ext/options_popup.png)
 
 Paste your Bing Maps key into the input field and click on 'Save'.
