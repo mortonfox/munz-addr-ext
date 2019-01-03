@@ -6,11 +6,12 @@ function init() {
 
     chrome.storage.local.get(['bingMapsKey'], result => {
       let key = result.bingMapsKey;
+      let url = `https://dev.virtualearth.net/REST/v1/Locations/${lat},${lon}?key=${key}`;
 
       let xhr = new XMLHttpRequest();
-      xhr.open('GET', `https://dev.virtualearth.net/REST/v1/Locations/${lat},${lon}?key=${key}`, true);
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
+      xhr.open('GET', url, true);
+      xhr.onload = () => {
+        if (xhr.status === 200) {
           let obj = JSON.parse(xhr.responseText);
 
           let addr = obj.resourceSets[0].resources[0].name;
@@ -20,6 +21,9 @@ function init() {
             addr_elem.appendChild(document.createTextNode(addr));
             loctext.parentNode.insertBefore(addr_elem, loctext);
           }
+        }
+        else {
+          console.log(`Fetch failed. xhr.status = ${xhr.status}`);
         }
       }
       xhr.send();
