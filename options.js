@@ -1,16 +1,39 @@
+function flash_result(color, message) {
+  let status = document.getElementById('status');
+  status.style.color = color;
+  status.textContent = message;
+  setTimeout(() => { status.textContent = ''; }, 1000);
+}
+
 // Saves Bing Maps key to chrome.storage
-function save_options() {
+function save_options(e) {
   let bing_maps_key = document.getElementById('bing_maps_key').value;
-  chrome.storage.local.set({
-    bingMapsKey: bing_maps_key
-  }, () => {
-    // Update status to let user know options were saved.
-    let status = document.getElementById('status');
-    status.textContent = 'Options saved.';
-    setTimeout(() => {
-      status.textContent = '';
-    }, 750);
-  });
+
+  let url = `https://dev.virtualearth.net/REST/v1/Locations/0,0?key=${bing_maps_key}`;
+
+  let xhr = new XMLHttpRequest();
+
+  // Test the key.
+  xhr.open('GET', url, true);
+
+  xhr.onload = () => {
+    if (xhr.status !== 200) {
+      flash_result('red', `Invalid key or other Bing Maps error. Status = ${xhr.status}`);
+      return;
+    }
+
+    // Key was accepted by Bing Maps.
+    chrome.storage.local.set({
+      bingMapsKey: bing_maps_key
+    }, () => {
+      // Update status to let user know options were saved.
+      flash_result('green', 'Options saved.');
+    });
+  }
+
+  xhr.send();
+
+  e.preventDefault();
 }
 
 // Restores Bing Maps key from chrome.storage
@@ -23,4 +46,4 @@ function restore_options() {
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);
-document.getElementById('save').addEventListener('click', save_options);
+document.getElementById('munz_addr_options').addEventListener('submit', save_options);
