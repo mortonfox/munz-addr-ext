@@ -14,10 +14,6 @@ function init() {
   const lat = parseFloat(latstr);
   const lon = parseFloat(lonstr);
 
-  function truncFloat(f) {
-    return Math.trunc(f * 100000) / 100000;
-  }
-
   function addElem(str) {
     const elem = document.createElement('div');
     elem.style.textAlign = 'center';
@@ -25,13 +21,13 @@ function init() {
     loctext.parentNode.insertBefore(elem, loctext);
   }
 
-  const dec_coords = `${truncFloat(lat)},${truncFloat(lon)}`;
+  const dec_coords = `${lat.toFixed(5)},${lon.toFixed(5)}`;
   addElem(dec_coords);
 
   function degmin(coord) {
     const deg = Math.trunc(coord);
     const min = Math.trunc((coord % 1) * 60 * 1000) / 1000;
-    return `${deg} ${min}`;
+    return `${deg} ${min.toFixed(3)}`;
   }
 
   const degmin_coords = `${lat >= 0 ? 'N' : 'S'} ${degmin(Math.abs(lat))} ${lon >= 0 ? 'E' : 'W'} ${degmin(Math.abs(lon))}`;
