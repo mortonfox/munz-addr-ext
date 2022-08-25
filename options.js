@@ -1,4 +1,8 @@
+// jshint strict: true, esversion: 8
+
 function flash_result(color, message) {
+  'use strict';
+
   const status = document.getElementById('status');
   status.style.color = color;
   status.textContent = message;
@@ -7,6 +11,8 @@ function flash_result(color, message) {
 
 // Saves Bing Maps key to chrome.storage
 function save_options(e) {
+  'use strict';
+
   const bing_maps_key = document.getElementById('bing_maps_key').value;
 
   const url = `https://dev.virtualearth.net/REST/v1/Locations/0,0?key=${bing_maps_key}`;
@@ -37,6 +43,8 @@ function save_options(e) {
 
 // Restores Bing Maps key from chrome.storage
 function restore_options() {
+  'use strict';
+
   chrome.storage.local.get({
     bingMapsKey: '' // default is an empty string
   }, items => {
