@@ -23,13 +23,6 @@ function init() {
     addElem(document.createTextNode(str));
   }
 
-  function flashResult(color, message) {
-    const status = document.getElementById('copy_status');
-    status.style.color = color;
-    status.textContent = message;
-    setTimeout(() => { status.textContent = ''; }, 1000);
-  }
-
   addText(`${lat.toFixed(5)},${lon.toFixed(5)}`);
 
   function degmin(coord) {
@@ -39,6 +32,46 @@ function init() {
   }
 
   addText(`${lat >= 0 ? 'N' : 'S'} ${degmin(Math.abs(lat))} ${lon >= 0 ? 'E' : 'W'} ${degmin(Math.abs(lon))}`);
+
+  // Display message for 1 second and then remove it.
+  function flashResult(color, message) {
+    const status = document.getElementById('copy_status');
+    status.style.color = color;
+    status.textContent = message;
+    setTimeout(() => { status.textContent = ''; }, 1000);
+  }
+
+  // Create a button that copies the addr string to the clipboard.
+  function copyButton(addr) {
+    const btn = document.createElement('button');
+    btn.name = btn.id = 'copy_addr';
+    btn.style.cssText = 'background-color: #fff; color: #E82A24; font-weight: 700; border: solid #E82A24; padding: 6px 10px; cursor: pointer';
+    btn.appendChild(document.createTextNode('Copy Addr'));
+    btn.addEventListener('mouseenter',
+      () => {
+        btn.style.color = '#fff';
+        btn.style.backgroundColor = '#E82A24';
+      }
+    );
+    btn.addEventListener('mouseleave',
+      () => {
+        btn.style.color = '#E82A24';
+        btn.style.backgroundColor = '#fff';
+      }
+    );
+    btn.addEventListener('click',
+      async () => {
+        try {
+          await navigator.clipboard.writeText(addr);
+          flashResult('green', 'Copied!');
+        }
+        catch (err) {
+          flashResult('red', `Copy failed! ${err.message}`);
+        }
+      }
+    );
+    return btn;
+  }
 
   chrome.storage.local.get(['bingMapsKey'], async result => {
     const key = result.bingMapsKey;
@@ -55,25 +88,10 @@ function init() {
 
       addText(addr);
 
-      let btn = document.createElement('button');
-      btn.name = btn.id = 'copy_addr';
-      btn.style.cssText = 'background-color: #E82A24; color: #fff; font-weight: 700; border: none; padding: 6px 10px; cursor: pointer';
-      btn.appendChild(document.createTextNode('Copy Addr'));
-      btn.addEventListener('click',
-        async () => {
-          try {
-            await navigator.clipboard.writeText(addr);
-            flashResult('green', 'Copied!');
-          }
-          catch (err) {
-            flashResult('red', `Copy failed! ${err.message}`);
-          }
-        }
-      );
-      let span = document.createElement('span');
-      span.appendChild(btn);
+      const span = document.createElement('span');
+      span.appendChild(copyButton(addr));
       span.appendChild(document.createElement('br'));
-      let status = document.createElement('span');
+      const status = document.createElement('span');
       status.id = status.name = 'copy_status';
       span.appendChild(status);
       addElem(span);
