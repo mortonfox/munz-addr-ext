@@ -73,33 +73,50 @@ function init() {
     return btn;
   }
 
-  chrome.storage.local.get(['bingMapsKey'], async result => {
-    const key = result.bingMapsKey;
-    const url = `https://dev.virtualearth.net/REST/v1/Locations/${latstr},${lonstr}?key=${key}`;
+  // Get Bing Maps API key from local storage.
+  function getKey() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get('bingMapsKey', result => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        resolve(result.bingMapsKey);
+      });
+    });
+  }
 
+  (async () => {
     try {
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error(`Status = ${resp.status} ${resp.statusText}`);
+      const key = await getKey();
+      const url = `https://dev.virtualearth.net/REST/v1/Locations/${latstr},${lonstr}?key=${key}`;
 
-      const jsonobj = await resp.json();
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`Status = ${resp.status} ${resp.statusText}`);
 
-      const addr = jsonobj.resourceSets[0].resources[0].name;
-      if (addr === undefined) return;
+        const jsonobj = await resp.json();
 
-      addText(addr);
+        const addr = jsonobj.resourceSets[0].resources[0].name;
+        if (addr === undefined) return;
 
-      const span = document.createElement('span');
-      span.appendChild(copyButton(addr));
-      span.appendChild(document.createElement('br'));
-      const status = document.createElement('span');
-      status.id = status.name = 'copy_status';
-      span.appendChild(status);
-      addElem(span);
+        addText(addr);
+
+        const span = document.createElement('span');
+        span.appendChild(copyButton(addr));
+        span.appendChild(document.createElement('br'));
+        const status = document.createElement('span');
+        status.id = status.name = 'copy_status';
+        span.appendChild(status);
+        addElem(span);
+      }
+      catch (err) {
+        addText(`Bing Maps API fetch error: ${err.message}`);
+      }
     }
     catch (err) {
-      addText(`Bing Maps API fetch error: ${err.message}`);
+      addText(`Failed to get Bing Maps API key from browser local storage: ${err.message}`);
     }
-  });
+  })();
 }
 
 init();
