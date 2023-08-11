@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Munz Addr",
-    "version": "0.0.3",
+    "version": "0.0.4",
 
     "description": "Reverse geocode a munzee and add its address to the page",
 
