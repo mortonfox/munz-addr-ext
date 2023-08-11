@@ -1,6 +1,6 @@
 // jshint strict: true, esversion: 8
 
-async function init() {
+async function run() {
   'use strict';
 
   // Check if we are on a munzee page.
@@ -23,7 +23,6 @@ async function init() {
     return getter();
   }
 
-
   let elem = await waitForElem(() => iframe.contentWindow.document.getElementById('munzee-holder'));
   let coords = [];
   for (let node of elem.childNodes) {
@@ -35,6 +34,9 @@ async function init() {
       }
     }
   }
+
+  iframe.remove();
+
   // console.log(coords);
 
   let locimage = await waitForElem(() => document.getElementById('locationimage'));
@@ -159,6 +161,20 @@ async function init() {
   })();
 }
 
-init();
+// Run the address inserter the first time and also whenever the URL changes.
+// Some links in the new Munzee web interface do not reload the page.
+const observeUrlChange = () => {
+  let oldHref = null;
+  const body = document.querySelector('body');
+  const observer = new MutationObserver(mutations => {
+    if (oldHref !== document.location.href) {
+      oldHref = document.location.href;
+      run();
+    }
+  });
+  observer.observe(body, { childList: true, subtree: true });
+};
+
+window.onload = observeUrlChange;
 
 // -- The End --
