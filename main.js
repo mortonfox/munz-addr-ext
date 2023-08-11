@@ -45,15 +45,6 @@ async function run() {
 
   let [lat, lon] = coords;
 
-  // const loctext = document.getElementById('locationtext');
-  // if (loctext === null) return;
-
-  // const latstr = loctext.getAttribute('data-latitude');
-  // const lonstr = loctext.getAttribute('data-longitude');
-
-  // const lat = parseFloat(latstr);
-  // const lon = parseFloat(lonstr);
-
   function addElem(elem) {
     const el = document.createElement('div');
     el.style.textAlign = 'center';
@@ -127,38 +118,36 @@ async function run() {
     });
   }
 
-  (async () => {
+  try {
+    const key = await getKey();
+    const url = `https://dev.virtualearth.net/REST/v1/Locations/${lat},${lon}?key=${key}`;
+
     try {
-      const key = await getKey();
-      const url = `https://dev.virtualearth.net/REST/v1/Locations/${lat},${lon}?key=${key}`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`Status = ${resp.status} ${resp.statusText}`);
 
-      try {
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`Status = ${resp.status} ${resp.statusText}`);
+      const jsonobj = await resp.json();
 
-        const jsonobj = await resp.json();
+      const addr = jsonobj.resourceSets[0].resources[0].name;
+      if (addr === undefined) return;
 
-        const addr = jsonobj.resourceSets[0].resources[0].name;
-        if (addr === undefined) return;
+      addText(addr);
 
-        addText(addr);
-
-        const span = document.createElement('span');
-        span.appendChild(copyButton(addr));
-        span.appendChild(document.createElement('br'));
-        const status = document.createElement('span');
-        status.id = status.name = 'copy_status';
-        span.appendChild(status);
-        addElem(span);
-      }
-      catch (err) {
-        addText(`Bing Maps API fetch error: ${err.message}`);
-      }
+      const span = document.createElement('span');
+      span.appendChild(copyButton(addr));
+      span.appendChild(document.createElement('br'));
+      const status = document.createElement('span');
+      status.id = status.name = 'copy_status';
+      span.appendChild(status);
+      addElem(span);
     }
     catch (err) {
-      addText(`Failed to get Bing Maps API key from browser local storage: ${err.message}`);
+      addText(`Bing Maps API fetch error: ${err.message}`);
     }
-  })();
+  }
+  catch (err) {
+    addText(`Failed to get Bing Maps API key from browser local storage: ${err.message}`);
+  }
 }
 
 // Run the address inserter the first time and also whenever the URL changes.
