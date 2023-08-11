@@ -3,6 +3,42 @@
 function init() {
   'use strict';
 
+  // Check if we are on a munzee page.
+  let loc = window.location.href;
+  console.log(loc);
+  if (!/munzee.com\/m\/\w+\/\d+/.test(loc)) return;
+
+  let mappage = loc.replace(/(munzee.com\/m\/\w+\/\d+).*$/, '$1/map/');
+  console.log(mappage);
+
+  let iframe = document.createElement("iframe");
+  // iframe.style.display = "none";
+  iframe.src = mappage;
+  document.body.appendChild(iframe);
+
+  function waitForSite() {
+    let targetelem = iframe.contentWindow.document.getElementById('munzee-holder');
+    if (targetelem !== null) {
+      clearInterval(waitForSiteTimer);
+      console.log(targetelem);
+
+      let coords = [];
+      for (let node of targetelem.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          let str = node.textContent.trim();
+          let m = str.match(/^(-?\d+\.\d+)$/);
+          if (m) {
+            coords.push(parseFloat(m[1]));
+          }
+        }
+      }
+      console.log(coords);
+
+    }
+  }
+  // Wait for site to finish loading before inserting button.
+  let waitForSiteTimer = setInterval(waitForSite, 100);
+
   const loctext = document.getElementById('locationtext');
   if (loctext === null) return;
 
