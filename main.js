@@ -39,17 +39,17 @@ async function run() {
 
   // console.log(coords);
 
-  let locimage = await waitForElem(() => document.getElementById('locationimage'));
-
   if (coords.length < 2) return;
 
   let [lat, lon] = coords;
+
+  let fragment = new DocumentFragment();
 
   function addElem(elem) {
     const el = document.createElement('div');
     el.style.textAlign = 'center';
     el.appendChild(elem);
-    locimage.appendChild(el);
+    fragment.appendChild(el);
   }
 
   function addText(str) {
@@ -148,6 +148,10 @@ async function run() {
   catch (err) {
     addText(`Failed to get Bing Maps API key from browser local storage: ${err.message}`);
   }
+
+  // Add the text and button only if not already there
+  let locimage = await waitForElem(() => document.getElementById('locationimage'));
+  if (!document.getElementById('copy_addr')) locimage.appendChild(fragment);
 }
 
 // Run the address inserter the first time and also whenever the URL changes.
