@@ -25,7 +25,7 @@
     "content_scripts": [
 	{
 	    "matches": [
-		"https://www.munzee.com/m/*"
+		"https://www.munzee.com/*"
 	    ],
 	    "js": ["main.js"]
 	}
